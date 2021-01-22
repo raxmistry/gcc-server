@@ -13,7 +13,7 @@ public class MyServer {
     private ServerSocket server;
     private final int port = 3000;
 
-    public MyServer() throws IOException, InterruptedException {
+    public MyServer() {
         new Thread(() -> {
             try {
                 server = new ServerSocket(port);
@@ -28,11 +28,10 @@ public class MyServer {
                 e.printStackTrace();
             }
         }).start();
-        Thread.sleep(1000);
     }
 
     public static void main(String[] args) {
-        //This should start the server from the cli
+        new MyServer();
     }
 
     public void shutdown() throws IOException {
@@ -46,24 +45,27 @@ public class MyServer {
 
 class Worker implements Runnable {
 
-    public Worker(Socket accept) throws IOException {
-        System.out.println("Connection accepted");
-        var reader = new BufferedReader(new InputStreamReader(accept.getInputStream()));
-        String input;
-        System.out.println("Server reading client data");
-        while ((input = reader.readLine()) != null) {
-            System.out.println("Received : " + input);
-            PrintWriter printWriter = new PrintWriter(accept.getOutputStream(), true);
-            printWriter.println("got it");
-            System.out.println("Data written back to client: ");
-        }
-        reader.close();
-        accept.close();
-        System.out.println("Work ending");
+    private Socket accept;
+
+    public Worker(Socket accept) {
+        this.accept = accept;
     }
 
     @Override
     public void run() {
-
+        System.out.println("Connection accepted");
+        try {
+            var reader = new BufferedReader(new InputStreamReader(accept.getInputStream()));
+            String input;
+            while ((input = reader.readLine()) != null) {
+                System.out.println("Received : " + input);
+                PrintWriter printWriter = new PrintWriter(accept.getOutputStream(), true);
+                printWriter.println("got it");
+            }
+            reader.close();
+            accept.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

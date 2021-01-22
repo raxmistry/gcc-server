@@ -16,7 +16,7 @@ public class ServerTest {
     MyServer server;
 
     @BeforeEach
-    void beforeEach() throws IOException, InterruptedException {
+    void beforeEach() {
         server = new MyServer();
     }
 
@@ -41,7 +41,7 @@ public class ServerTest {
     }
 
     @Test
-    void should_indicate_server_is_up() throws Exception {
+    void should_indicate_server_is_up() {
         assertThat(server.isUp()).isTrue();
     }
 

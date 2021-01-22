@@ -50,15 +50,16 @@ class Worker implements Runnable {
         System.out.println("Connection accepted");
         var reader = new BufferedReader(new InputStreamReader(accept.getInputStream()));
         String input;
+        System.out.println("Server reading client data");
         while ((input = reader.readLine()) != null) {
             System.out.println("Received : " + input);
-            PrintWriter printWriter = new PrintWriter(accept.getOutputStream());
-            printWriter.write("got it");
-            printWriter.flush();
-            printWriter.close();
+            PrintWriter printWriter = new PrintWriter(accept.getOutputStream(), true);
+            printWriter.println("got it");
+            System.out.println("Data written back to client: ");
         }
         reader.close();
         accept.close();
+        System.out.println("Work ending");
     }
 
     @Override

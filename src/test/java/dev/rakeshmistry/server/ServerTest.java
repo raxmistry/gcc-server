@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.FutureTask;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,22 +28,44 @@ public class ServerTest {
     void should_start_server() throws IOException, InterruptedException {
         server = new MyServer();
         try (Socket socket = new Socket("localhost", 3000)) {
-            PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+            PrintWriter printWriter = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            printWriter.write("Test");
-            printWriter.flush();
-            String serverResponse;
-//            while ((serverResponse = reader.readLine()) != null) {
-//                assertThat(serverResponse).isEqualTo("got it");
-//            }
+            System.out.println("writing to server");
+            printWriter.println("Test");
+            readServerResponse(reader);
             printWriter.close();
             assertThat(server.isUp());
-            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    private void readServerResponse(BufferedReader reader) throws IOException {
+        System.out.println("about to read from server");
+        String s = reader.readLine();
+        System.out.println(s);
+//        new Thread(() -> {
+//            String serverResponse;
+//            try {
+//                while ((serverResponse = reader.readLine()) != null) {
+//                    assertThat(serverResponse).isEqualTo("got it");
+//                }
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//
+//                try {
+//                    reader.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
     }
 
     @Test
     void should_indicate_server_is_up() throws Exception {
-        assertThat(server.isUp()).isEqualTo(true);
+        new MyServer();
+        Thread.sleep(10000);
     }
 }

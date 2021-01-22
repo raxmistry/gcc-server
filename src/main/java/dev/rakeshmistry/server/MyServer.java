@@ -1,5 +1,6 @@
 package dev.rakeshmistry.server;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -17,6 +18,7 @@ public class MyServer {
             try {
                 server = new ServerSocket(port);
                 System.out.println("Server started on port:" + port);
+                stopped = false;
 
                 AtomicInteger currentConnections = new AtomicInteger();
                 while (!stopped) {
@@ -32,11 +34,19 @@ public class MyServer {
                         currentConnections.getAndIncrement();
                     }
                 }
-                server.close();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     public static void main(String[] args) {
